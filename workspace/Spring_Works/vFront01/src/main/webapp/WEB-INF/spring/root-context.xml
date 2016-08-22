@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+		
+		<import resource="classpath:context_config/jdbc-context.xml"/>
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/>
+	
+	<!-- cron bean 설정 -->
+	<bean id="EmailQuartzBean" class="org.springframework.scheduling.quartz.JobDetailBean">
+   		<property name="jobClass" value="spring.mvc.vfront01.Bean.EmailQuartzBean"/>
+	</bean>
+	
+	<bean id="QuartzTestBean" class="org.springframework.scheduling.quartz.JobDetailBean">
+   		<property name="jobClass" value="spring.mvc.vfront01.Bean.QuartzTestBean"/>
+	</bean>
+	
+	
+	<!-- cron 시간 설정 -->
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+   		<property name="jobDetail" ref="EmailQuartzBean"/>
+    	<property name="cronExpression" value="0 0 6 * * ?"/>
+	</bean>
+	
+
+	<!-- execute cron -->
+
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+    <property name="triggers">
+        <list>
+            <ref bean="cronTrigger"/>
+        </list>
+    </property>
+    <property name="quartzProperties">
+        <props>
+            <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+            <prop key="org.quartz.threadPool.threadCount">3</prop>
+            <prop key="org.quartz.threadPool.threadPriority">4</prop>
+            <prop key="org.quartz.jobStore.class">org.quartz.simpl.RAMJobStore</prop>
+            <prop key="org.quartz.jobStore.misfireThreshold">60000</prop>
+        </props>
+    </property>
+</bean>
+
+<!-- mail sending bean -->
+
+		
+</beans>
